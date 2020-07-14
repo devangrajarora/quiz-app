@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'question.dart';
 
 void main() => runApp(Quizzler());
 
@@ -27,6 +29,9 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scorekeeper = [];
 
+  int n = questions.length;
+  int qno = 0;
+
   void addCheck() => scorekeeper.add(Icon(
         Icons.check,
         color: Colors.green,
@@ -37,7 +42,15 @@ class _QuizPageState extends State<QuizPage> {
         color: Colors.red,
       ));
 
-  Expanded button({String option, Color color}) {
+  Expanded button({String option, Color color, bool first}) {
+    if (qno == n - 1) {
+      if (first) {
+        option = 'Retry';
+      } else {
+        option = 'Quit';
+      }
+    }
+
     return Expanded(
       flex: 2,
       child: Padding(
@@ -56,10 +69,26 @@ class _QuizPageState extends State<QuizPage> {
           ),
           onPressed: () {
             setState(() {
-              if (option == 'True')
-                addCheck();
-              else
-                addCross();
+              bool userAns;
+
+              if (option == 'Retry') {
+                qno = 0;
+                scorekeeper.clear();
+              } else if (option == 'Quit') {
+                SystemNavigator.pop();
+              } else {
+                if (option == 'True') {
+                  userAns = true;
+                } else if (option == 'False') {
+                  userAns = false;
+                }
+                if (userAns == questions[qno].ans)
+                  addCheck();
+                else
+                  addCross();
+
+                qno++;
+              }
             });
           },
         ),
@@ -77,7 +106,8 @@ class _QuizPageState extends State<QuizPage> {
           flex: 12,
           child: Center(
             child: Text(
-              'Question will go here',
+              questions[qno].text,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 25.0,
@@ -85,8 +115,8 @@ class _QuizPageState extends State<QuizPage> {
             ),
           ),
         ),
-        button(option: 'True', color: Colors.green),
-        button(option: 'False', color: Colors.red),
+        button(option: 'True', color: Colors.green, first: true),
+        button(option: 'False', color: Colors.red, first: false),
         Expanded(
           flex: 1,
           child: Padding(

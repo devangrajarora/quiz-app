@@ -10,6 +10,8 @@
 .history
 .svn/
 
+extra-questions.txt
+
 # IntelliJ related
 *.iml
 *.ipr
