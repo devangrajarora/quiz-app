@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'question.dart';
 
+QuestionBank qb = QuestionBank();
+
 void main() => runApp(Quizzler());
 
 class Quizzler extends StatelessWidget {
@@ -29,8 +31,9 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scorekeeper = [];
 
-  int n = questions.length;
+  int n = qb.len();
   int qno = 0;
+  int correct = 0;
 
   void addCheck() => scorekeeper.add(Icon(
         Icons.check,
@@ -82,10 +85,12 @@ class _QuizPageState extends State<QuizPage> {
                 } else if (option == 'False') {
                   userAns = false;
                 }
-                if (userAns == questions[qno].ans)
+                if (userAns == qb.getAnswer(qno)) {
+                  correct++;
                   addCheck();
-                else
+                } else {
                   addCross();
+                }
 
                 qno++;
               }
@@ -98,6 +103,12 @@ class _QuizPageState extends State<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
+    String text = qb.getQuestion(qno);
+    if (qno == n - 1) {
+      text = 'You got $correct/$qno answers correct!';
+      correct = 0;
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -106,7 +117,7 @@ class _QuizPageState extends State<QuizPage> {
           flex: 12,
           child: Center(
             child: Text(
-              questions[qno].text,
+              text,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -130,9 +141,3 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 }
-
-/*
-question1: 'You can lead a cow down stairs but not up stairs.', false,
-question2: 'Approximately one quarter of human bones are in the feet.', true,
-question3: 'A slug\'s blood is green.', true,
-*/
